@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Giám sát Lũ & Thời tiết Hội An</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap");
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f3f4f6;
+      }
+
+      .header-bg {
+        background:
+          linear-gradient(rgba(0, 48, 100, 0.7), rgba(0, 48, 100, 0.7)),
+          url("./assets/songhoaihoian.jpg");
+        background-size: cover;
+        background-position: center;
+      }
+
+      .card-header {
+        background: linear-gradient(to bottom, #1e40af, #1e3a8a);
+      }
+
+      .scanline {
+        width: 100%;
+        height: 2px;
+        background: rgba(255, 255, 255, 0.1);
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 10;
+        animation: scan 4s linear infinite;
+      }
+
+      @keyframes scan {
+        0% {
+          top: 0;
+        }
+        100% {
+          top: 100%;
+        }
+      }
+
+      .advice-box {
+        border-left: 4px solid #f59e0b;
+        background-color: #fffbeb;
+      }
+
+      .status-badge {
+        transition: all 0.3s ease;
+      }
+    </style>
+  </head>
+  <body class="p-4 md:p-8">
+    <div
+      class="max-w-6xl mx-auto shadow-2xl rounded-lg overflow-hidden bg-white border border-gray-200"
+    >
+      <!-- Header Section -->
+      <header
+        class="header-bg h-56 md:h-64 relative flex flex-col items-center justify-center text-white p-6 border-b-4 border-blue-600"
+      >
+        <div class="absolute top-4 right-4 flex items-center gap-2">
+          <button
+            id="refresh-now"
+            class="bg-emerald-500/90 hover:bg-emerald-600 text-[10px] px-2 py-1 rounded backdrop-blur-sm border border-emerald-300 font-semibold shadow-sm transition"
+          >
+            Làm mới ngay
+          </button>
+          <div
+            class="bg-blue-600/80 text-[10px] px-2 py-1 rounded backdrop-blur-sm border border-blue-400"
+          >
+            Auto-refresh: 15m
+          </div>
+          <div
+            class="bg-red-600 text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1 animate-pulse shadow-lg"
+          >
+            <span class="w-2 h-2 bg-white rounded-full"></span> LIVE
+          </div>
+        </div>
+        <h1
+          class="text-2xl md:text-4xl font-bold text-center uppercase mb-2 tracking-wide drop-shadow-lg"
+        >
+          Hệ thống giám sát lũ lụt Hội An
+        </h1>
+        <div class="h-1 w-24 bg-yellow-400 mb-4 shadow-lg"></div>
+        <h2
+          class="text-lg md:text-xl font-medium text-center uppercase opacity-90 italic"
+        >
+          Dữ liệu thời gian thực - Sông Thu Bồn
+        </h2>
+      </header>
+
+      <!-- Main Content -->
+      <main class="p-4 md:p-6 bg-slate-50">
+        <!-- Statistics & Predictions Row -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+          <!-- Current Water Level -->
+          <div
+            class="bg-white rounded shadow-md border border-gray-200 overflow-hidden"
+          >
+            <div
+              class="card-header text-white text-center py-1.5 font-bold text-[10px] tracking-wider uppercase"
+            >
+              Mực nước Thu Bồn
+            </div>
+            <div class="p-4 text-center">
+              <div class="text-4xl font-black text-blue-900 mb-1">
+                <span id="current-water-level">--</span>
+                <span class="text-xl">m</span>
+              </div>
+              <div
+                id="alert-status"
+                class="status-badge text-[9px] font-bold py-1 px-3 rounded-full inline-block uppercase bg-gray-200"
+              >
+                Đang kết nối...
+              </div>
+            </div>
+          </div>
+
+          <!-- Weather Forecast 1-3h -->
+          <div
+            class="bg-white rounded shadow-md border border-gray-200 overflow-hidden"
+          >
+            <div
+              class="card-header text-white text-center py-1.5 font-bold text-[10px] tracking-wider uppercase"
+            >
+              Dự báo 3 giờ tới
+            </div>
+            <div class="p-3 flex flex-col items-center justify-center h-24">
+              <div class="flex items-center gap-2">
+                <span id="forecast-icon" class="text-3xl">--</span>
+                <div class="text-left leading-tight">
+                  <p id="forecast-temp" class="text-lg font-bold text-blue-900">
+                    --°C
+                  </p>
+                  <p
+                    id="forecast-text"
+                    class="text-[10px] text-gray-500 font-semibold"
+                  >
+                    Đang tính...
+                  </p>
+                </div>
+              </div>
+              <p class="text-[9px] text-blue-600 mt-2 font-bold italic">
+                Khả năng mưa: <span id="rain-chance">--</span>%
+              </p>
+            </div>
+          </div>
+
+          <!-- Weather Real-time -->
+          <div
+            class="bg-white rounded shadow-md border border-gray-200 overflow-hidden"
+          >
+            <div
+              class="card-header text-white text-center py-1.5 font-bold text-[10px] tracking-wider uppercase"
+            >
+              Thời tiết hiện tại
+            </div>
+            <div class="p-3 flex items-center justify-around h-24">
+              <span id="weather-icon" class="text-4xl">--</span>
+              <div class="text-right">
+                <p
+                  id="current-temp"
+                  class="text-2xl font-bold text-blue-900 leading-none"
+                >
+                  --°C
+                </p>
+                <p
+                  id="weather-desc"
+                  class="text-[10px] font-bold text-blue-800 uppercase mt-1"
+                >
+                  --
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Smart AI Advice -->
+          <div
+            class="advice-box rounded shadow-md border border-amber-200 overflow-hidden"
+          >
+            <div
+              class="bg-amber-400 text-amber-900 text-center py-1 font-bold text-[9px] uppercase"
+            >
+              Lời khuyên thông minh (AI)
+            </div>
+            <div class="p-3 h-24 overflow-y-auto">
+              <ul
+                id="advice-list"
+                class="text-[11px] text-amber-950 leading-tight space-y-1.5 list-none font-medium"
+              >
+                <li class="flex gap-2 items-center">
+                  <span class="animate-pulse">●</span> Đang phân tích dữ liệu
+                  API...
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Visualization Row -->
+        <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          <!-- Chart Area -->
+          <div
+            class="lg:col-span-3 bg-white rounded shadow-md border border-gray-200 overflow-hidden"
+          >
+            <div
+              class="card-header text-white text-center py-2 font-bold text-sm tracking-wider uppercase"
+            >
+              Biến động lượng mưa & Mực nước (Dự báo 12h)
+            </div>
+            <div class="p-4 h-72">
+              <canvas id="waterChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Camera Monitoring UI -->
+          <div
+            class="lg:col-span-2 bg-white rounded shadow-md border border-gray-200 overflow-hidden"
+          >
+            <div
+              class="card-header text-white text-center py-2 font-bold text-sm tracking-wider uppercase"
+            >
+              Camera hiện trường - Phố Cổ
+            </div>
+            <div class="p-0 relative h-72 bg-black overflow-hidden group">
+              <div class="scanline"></div>
+              <img
+                src="https://images.unsplash.com/photo-1590001155093-a3c66ab0c3ff?q=80&w=1000&auto=format&fit=crop"
+                alt="Hội An Riverside"
+                class="w-full h-full object-cover filter brightness-90"
+              />
+              <div class="absolute top-4 left-4 z-30 flex flex-col gap-1">
+                <div
+                  class="bg-red-600 px-2 py-0.5 rounded text-[9px] text-white font-bold flex items-center gap-1 shadow-lg"
+                >
+                  <span
+                    class="w-1.5 h-1.5 bg-white rounded-full animate-ping"
+                  ></span>
+                  CAMERA_01
+                </div>
+              </div>
+              <div
+                class="absolute top-4 right-4 z-30 text-white font-mono text-[10px] text-right bg-black/50 p-1.5 rounded border border-white/20"
+              >
+                <p id="cam-date">--/--/----</p>
+                <p id="cam-time" class="text-yellow-400 font-bold">--:--:--</p>
+              </div>
+              <div
+                class="absolute bottom-4 left-4 z-30 text-white font-mono text-[9px] opacity-80 bg-black/30 p-1"
+              >
+                <p>VỊ TRÍ: 15.8770 N, 108.3274 E</p>
+                <p>TRẠM: THU_BON_RIVER_01</p>
+              </div>
+            </div>
+            <div
+              class="p-2 bg-gray-100 flex justify-between items-center text-[9px] text-gray-400 uppercase font-bold px-4"
+            >
+              <span>Giao diện giám sát thiên tai</span>
+              <span id="next-refresh-label">Làm mới sau: 15:00</span>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <footer
+        class="bg-slate-800 p-4 flex justify-between items-center text-[10px] text-slate-400 border-t border-slate-700 uppercase tracking-widest"
+      >
+        <div>Dữ liệu: Open-Meteo (Hội An Station)</div>
+        <div>
+          Cập nhật cuối:
+          <span id="last-update" class="text-white font-bold">--:--:--</span>
+        </div>
+      </footer>
+    </div>
+
+    <script>
+      let waterChart;
+      let refreshTimer = 900; // 15 minutes in seconds
+
+      async function fetchWeatherData() {
+        // Tọa độ Hội An: 15.88, 108.33
+        const lat = 15.8801;
+        const lon = 108.3274;
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,precipitation&hourly=temperature_2m,weather_code,precipitation_probability,precipitation&timezone=Asia%2FBangkok`;
+
+        // Cập nhật trạng thái "đang phân tích" ngay khi bắt đầu lấy dữ liệu
+        const adviceListEl = document.getElementById("advice-list");
+        if (adviceListEl) {
+          adviceListEl.innerHTML = `
+            <li class="flex gap-2 items-center text-amber-700">
+              <span class="animate-pulse">●</span>
+              <span>Đang phân tích dữ liệu thời tiết mới nhất...</span>
+            </li>
+          `;
+        }
+
+        // Nếu có nút làm mới, hiển thị trạng thái đang tải
+        const refreshBtn = document.getElementById("refresh-now");
+        const originalRefreshText = refreshBtn ? refreshBtn.innerText : "";
+        if (refreshBtn) {
+          refreshBtn.disabled = true;
+          refreshBtn.classList.add("opacity-70", "cursor-not-allowed");
+          refreshBtn.innerText = "Đang cập nhật...";
+        }
+
+        try {
+          const response = await fetch(url);
+          if (!response.ok) throw new Error("API Error");
+          const data = await response.json();
+
+          processData(data);
+
+          // Reset timer after successful fetch
+          refreshTimer = 900;
+          document.getElementById("last-update").innerText =
+            new Date().toLocaleTimeString("vi-VN");
+        } catch (err) {
+          console.error("Lỗi cập nhật dữ liệu:", err);
+          document.getElementById("advice-list").innerHTML =
+            `<li class="text-red-600">⚠️ Lỗi kết nối API. Đang thử lại...</li>`;
+        } finally {
+          if (refreshBtn) {
+            refreshBtn.disabled = false;
+            refreshBtn.classList.remove("opacity-70", "cursor-not-allowed");
+            refreshBtn.innerText = originalRefreshText || "Làm mới ngay";
+          }
+        }
+      }
+
+      function processData(data) {
+        const current = data.current;
+        const weatherMap = {
+          0: { icon: "☀️", desc: "Trời quang" },
+          1: { icon: "🌤️", desc: "Ít mây" },
+          2: { icon: "⛅", desc: "Có mây" },
+          3: { icon: "☁️", desc: "Nhiều mây" },
+          45: { icon: "🌫️", desc: "Có sương mù" },
+          61: { icon: "🌧️", desc: "Mưa nhẹ" },
+          63: { icon: "🌧️", desc: "Mưa vừa" },
+          65: { icon: "🌧️", desc: "Mưa to" },
+          80: { icon: "🌦️", desc: "Mưa rào nhẹ" },
+          95: { icon: "⛈️", desc: "Dông sét" },
+        };
+
+        // 1. Cập nhật thời tiết hiện tại
+        const currentInfo = weatherMap[current.weather_code] || {
+          icon: "🌡️",
+          desc: "Bình thường",
+        };
+        document.getElementById("current-temp").innerText =
+          `${Math.round(current.temperature_2m)}°C`;
+        document.getElementById("weather-desc").innerText = currentInfo.desc;
+        document.getElementById("weather-icon").innerText = currentInfo.icon;
+
+        // 2. Dự báo 3h tới (Lấy giá trị index 3 trong hourly)
+        const forecastIdx = 3;
+        const fWeatherCode = data.hourly.weather_code[forecastIdx];
+        const fTemp = data.hourly.temperature_2m[forecastIdx];
+        const fRainProb = data.hourly.precipitation_probability[forecastIdx];
+        const fInfo = weatherMap[fWeatherCode] || currentInfo;
+
+        document.getElementById("forecast-temp").innerText =
+          `${Math.round(fTemp)}°C`;
+        document.getElementById("forecast-text").innerText = fInfo.desc;
+        document.getElementById("forecast-icon").innerText = fInfo.icon;
+        document.getElementById("rain-chance").innerText = fRainProb;
+
+        // 3. Mô phỏng mực nước dựa trên lượng mưa thực tế
+        // Giả định mực nước cơ bản là 1.2m, mỗi 1mm mưa tăng ~0.15m mực nước
+        const baseLevel = 1.2;
+        const rainImpact = current.precipitation * 0.15;
+        const currentLevel = (
+          baseLevel +
+          rainImpact +
+          Math.random() * 0.05
+        ).toFixed(2);
+        document.getElementById("current-water-level").innerText = currentLevel;
+
+        // Trạng thái báo động
+        const alertEl = document.getElementById("alert-status");
+        let statusLevel = "SAFE";
+        if (currentLevel > 3.0) {
+          alertEl.innerText = "BÁO ĐỘNG 3";
+          alertEl.className =
+            "status-badge text-[9px] font-bold py-1 px-3 rounded-full inline-block uppercase bg-red-600 text-white animate-pulse";
+          statusLevel = "DANGER";
+        } else if (currentLevel > 2.0) {
+          alertEl.innerText = "BÁO ĐỘNG 2";
+          alertEl.className =
+            "status-badge text-[9px] font-bold py-1 px-3 rounded-full inline-block uppercase bg-yellow-500 text-white";
+          statusLevel = "WARNING";
+        } else {
+          alertEl.innerText = "AN TOÀN";
+          alertEl.className =
+            "status-badge text-[9px] font-bold py-1 px-3 rounded-full inline-block uppercase bg-green-600 text-white";
+          statusLevel = "SAFE";
+        }
+
+        // 4. Lời khuyên thông minh dựa trên dữ liệu tích hợp
+        generateSmartAdvice(
+          statusLevel,
+          current.precipitation,
+          fRainProb,
+          fTemp,
+          fWeatherCode,
+        );
+
+        // 5. Biểu đồ 12h tới
+        const labels = data.hourly.time
+          .slice(0, 12)
+          .map((t) => t.split("T")[1]);
+        const rainData = data.hourly.precipitation.slice(0, 12);
+        // Giả lập mực nước tương ứng lượng mưa dự báo
+        const levelData = rainData.map((r) =>
+          (baseLevel + r * 0.15 + Math.random() * 0.1).toFixed(2),
+        );
+        updateChart(labels, levelData, rainData);
+      }
+
+      function generateSmartAdvice(status, rain, fRainProb, temp, fCode) {
+        const list = document.getElementById("advice-list");
+        list.innerHTML = "";
+        const advices = [];
+
+        // Ưu tiên 1: An toàn lũ lụt
+        if (status === "DANGER") {
+          advices.push(
+            "⚠️ NGUY HIỂM: Di dời tài sản lên tầng cao và chuẩn bị sơ tán.",
+          );
+          advices.push(
+            "🚫 Tuyệt đối không di chuyển qua các vùng ngập sâu trong phố cổ.",
+          );
+        } else if (status === "WARNING") {
+          advices.push(
+            "📢 Chú ý: Mực nước đang dâng cao, hạn chế để xe ở vùng thấp ven sông.",
+          );
+        }
+
+        // Ưu tiên 2: Thời tiết ngắn hạn
+        if (fRainProb > 70 || rain > 0) {
+          advices.push(
+            "☂️ Dự kiến có mưa lớn: Du khách nên mang theo áo mưa hoặc ở trong nhà.",
+          );
+          if (fCode >= 95)
+            advices.push(
+              "⚡ Cảnh báo dông sét: Tránh trú dưới tán cây lớn và các công trình cũ.",
+            );
+        } else if (fRainProb > 30) {
+          advices.push(
+            "☁️ Trời có thể có mưa rào nhẹ, hãy chuẩn bị sẵn ô (dù).",
+          );
+        }
+
+        // Ưu tiên 3: Sức khỏe & Du lịch
+        if (temp > 34) {
+          advices.push(
+            "☀️ Trời nắng nóng gắt: Nên uống nhiều nước và hạn chế ra ngoài lúc trưa.",
+          );
+        } else if (temp < 22) {
+          advices.push(
+            "🧥 Thời tiết se lạnh về đêm, hãy mang theo áo khoác nhẹ khi dạo phố.",
+          );
+        }
+
+        if (advices.length === 0 || (status === "SAFE" && fRainProb < 20)) {
+          advices.push(
+            "✅ Điều kiện lý tưởng để tham quan Phố Cổ Hội An và đi thuyền sông Hoài.",
+          );
+        }
+
+        advices.forEach((text) => {
+          const li = document.createElement("li");
+          li.className =
+            "flex gap-2 items-start text-amber-900 border-b border-amber-200/50 pb-1";
+          li.innerHTML = `<span class="text-amber-600">▶</span> <span>${text}</span>`;
+          list.appendChild(li);
+        });
+      }
+
+      function updateChart(labels, levelData, rainData) {
+        const ctx = document.getElementById("waterChart").getContext("2d");
+        if (waterChart) waterChart.destroy();
+        waterChart = new Chart(ctx, {
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                type: "line",
+                label: "Mực nước (m)",
+                data: levelData,
+                borderColor: "#1e40af",
+                backgroundColor: "rgba(30, 64, 175, 0.1)",
+                fill: true,
+                yAxisID: "y",
+                tension: 0.4,
+              },
+              {
+                type: "bar",
+                label: "Lượng mưa (mm)",
+                data: rainData,
+                backgroundColor: "rgba(56, 189, 248, 0.6)",
+                yAxisID: "y1",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { labels: { font: { size: 10 } } } },
+            scales: {
+              y: {
+                type: "linear",
+                display: true,
+                position: "left",
+                min: 0,
+                max: 5,
+                title: { display: true, text: "m", font: { size: 10 } },
+              },
+              y1: {
+                type: "linear",
+                display: true,
+                position: "right",
+                grid: { drawOnChartArea: false },
+                title: { display: true, text: "mm", font: { size: 10 } },
+              },
+              x: { ticks: { font: { size: 9 } } },
+            },
+          },
+        });
+      }
+
+      function updateClocks() {
+        const now = new Date();
+        document.getElementById("cam-date").innerText =
+          now.toLocaleDateString("vi-VN");
+        document.getElementById("cam-time").innerText =
+          now.toLocaleTimeString("vi-VN");
+
+        // Countdown timer display
+        refreshTimer--;
+        if (refreshTimer <= 0) {
+          fetchWeatherData();
+        }
+        const mins = Math.floor(refreshTimer / 60);
+        const secs = refreshTimer % 60;
+        document.getElementById("next-refresh-label").innerText =
+          `Làm mới sau: ${mins}:${secs < 10 ? "0" + secs : secs}`;
+      }
+
+      window.onload = () => {
+        fetchWeatherData();
+        setInterval(updateClocks, 1000);
+
+        const refreshBtn = document.getElementById("refresh-now");
+        if (refreshBtn) {
+          refreshBtn.addEventListener("click", () => {
+            // Đặt lại timer và gọi cập nhật ngay
+            refreshTimer = 900;
+            fetchWeatherData();
+          });
+        }
+      };
+    </script>
+  </body>
+</html>
