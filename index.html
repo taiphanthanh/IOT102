@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
@@ -16,9 +16,13 @@
 
       .header-bg {
         background: linear-gradient(
-          rgba(0, 48, 100, 0.8),
-          rgba(0, 48, 100, 0.8)
-        );
+            rgba(0, 48, 100, 0.45),
+            rgba(0, 48, 100, 0.45)
+          ),
+          url("songhoaihoian.jpg");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
       }
 
       .card-header {
@@ -60,12 +64,28 @@
         <h2
           class="text-sm md:text-lg font-medium text-center uppercase opacity-90 italic"
         >
-          ESP32 + HC-SR04 + Blynk + LCD
+          Dữ Liệu Thời Gian Thực
         </h2>
       </header>
 
       <main class="p-4 md:p-6 bg-slate-50">
         <!-- Live Stats -->
+
+        <div
+          class="bg-white rounded shadow-md border border-gray-200 p-4 mb-4 text-center"
+        >
+          <h2 class="font-bold text-lg mb-2">🤖 AI Phân tích xu hướng</h2>
+
+          <div id="ai-trend" class="text-3xl font-black text-blue-900 mb-2">
+            --
+          </div>
+
+          <div id="ai-message" class="text-sm font-bold text-slate-700">--</div>
+
+          <div class="text-xs text-slate-500 mt-2">
+            Tốc độ: <span id="ai-slope">--</span> cm/s
+          </div>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
           <!-- Distance -->
           <div
@@ -132,7 +152,10 @@
               >
                 --
               </div>
-              <div id="alert-text" class="mt-2 text-[11px] font-bold text-slate-700">
+              <div
+                id="alert-text"
+                class="mt-2 text-[11px] font-bold text-slate-700"
+              >
                 --
               </div>
             </div>
@@ -148,29 +171,49 @@
               Outputs (V3, V4)
             </div>
             <div class="p-4">
-              <div class="flex items-center justify-between text-[12px] font-bold">
+              <div
+                class="flex items-center justify-between text-[12px] font-bold"
+              >
                 <span>Relay 1</span>
                 <span id="relay1-state" class="text-blue-900">--</span>
               </div>
-              <div class="mt-2 flex items-center justify-between text-[12px] font-bold">
+              <div
+                class="mt-2 flex items-center justify-between text-[12px] font-bold"
+              >
                 <span>Relay 2</span>
                 <span id="relay2-state" class="text-blue-900">--</span>
               </div>
-              <div class="mt-2 flex items-center justify-between text-[12px] font-bold">
+              <div
+                class="mt-2 flex items-center justify-between text-[12px] font-bold"
+              >
                 <span>LED SOS</span>
                 <span id="led-state" class="text-blue-900">--</span>
               </div>
               <div class="mt-3 text-[11px] text-slate-500">
-                V3: Relay1 (trạng thái gửi từ ESP32), V4: LED SOS.
-                Relay2 (V11) hiện chưa có V-pin trạng thái trong sketch nên trang sẽ suy ra theo Alert Level (V2).
+                V3: Relay1 (trạng thái gửi từ ESP32), V4: LED SOS. Relay2 (V11)
+                hiện chưa có V-pin trạng thái trong sketch nên trang sẽ suy ra
+                theo Alert Level (V2).
               </div>
             </div>
           </div>
         </div>
 
+        <!-- Dự đoán ngắn hạn-->
+        <div
+          class="bg-white rounded shadow-md border border-gray-200 p-4 mb-4 text-center"
+        >
+          <h2 class="font-bold text-lg mb-2">🔮 Dự đoán ngắn hạn</h2>
+
+          <div>5 phút: <span id="pred-5">--</span> cm</div>
+          <div>10 phút: <span id="pred-10">--</span> cm</div>
+          <div>15 phút: <span id="pred-15">--</span> cm</div>
+        </div>
+
         <!-- Thresholds (read-only) -->
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-4 mb-4">
-          <div class="lg:col-span-5 bg-white rounded shadow-md border border-gray-200 overflow-hidden">
+          <div
+            class="lg:col-span-5 bg-white rounded shadow-md border border-gray-200 overflow-hidden"
+          >
             <div
               class="card-header text-white text-center py-2 font-bold text-sm tracking-wider uppercase"
             >
@@ -190,9 +233,7 @@
                     readonly
                     class="mt-2 w-full border border-gray-300 rounded px-3 py-2 text-[12px] bg-slate-100 text-slate-700 outline-none"
                   />
-                  <div class="text-[11px] text-slate-500 mt-2">
-                    Đơn vị: cm
-                  </div>
+                  <div class="text-[11px] text-slate-500 mt-2">Đơn vị: cm</div>
                 </div>
 
                 <div class="border border-gray-200 rounded p-3">
@@ -207,9 +248,7 @@
                     readonly
                     class="mt-2 w-full border border-gray-300 rounded px-3 py-2 text-[12px] bg-slate-100 text-slate-700 outline-none"
                   />
-                  <div class="text-[11px] text-slate-500 mt-2">
-                    Đơn vị: cm
-                  </div>
+                  <div class="text-[11px] text-slate-500 mt-2">Đơn vị: cm</div>
                 </div>
 
                 <div class="border border-gray-200 rounded p-3">
@@ -224,9 +263,7 @@
                     readonly
                     class="mt-2 w-full border border-gray-300 rounded px-3 py-2 text-[12px] bg-slate-100 text-slate-700 outline-none"
                   />
-                  <div class="text-[11px] text-slate-500 mt-2">
-                    Đơn vị: cm
-                  </div>
+                  <div class="text-[11px] text-slate-500 mt-2">Đơn vị: cm</div>
                 </div>
               </div>
 
@@ -235,7 +272,8 @@
                   SENSOR_TO_BOTTOM_CM
                 </div>
                 <div class="text-[12px] font-bold mt-1">
-                  Mốc đáy (tham số trong Arduino): <span id="bottom-ref-cm">200.0</span> cm
+                  Mốc đáy (tham số trong Arduino):
+                  <span id="bottom-ref-cm">200.0</span> cm
                 </div>
                 <div class="text-[11px] text-slate-500 mt-2">
                   Giá trị này hiện đang cố định theo sketch demo (`200.0`).
@@ -247,8 +285,12 @@
 
         <!-- Charts & History -->
         <div class="grid grid-cols-1 lg:grid-cols-5 gap-4">
-          <div class="lg:col-span-4 bg-white rounded shadow-md border border-gray-200 overflow-hidden">
-            <div class="card-header text-white text-center py-2 font-bold text-sm tracking-wider uppercase">
+          <div
+            class="lg:col-span-4 bg-white rounded shadow-md border border-gray-200 overflow-hidden"
+          >
+            <div
+              class="card-header text-white text-center py-2 font-bold text-sm tracking-wider uppercase"
+            >
               Lịch sử 2-5 phút gần nhất (Water Level & Distance)
             </div>
             <div class="p-4 h-80">
@@ -256,8 +298,12 @@
             </div>
           </div>
 
-          <div class="lg:col-span-1 bg-white rounded shadow-md border border-gray-200 overflow-hidden">
-            <div class="card-header text-white text-center py-2 font-bold text-sm tracking-wider uppercase">
+          <div
+            class="lg:col-span-1 bg-white rounded shadow-md border border-gray-200 overflow-hidden"
+          >
+            <div
+              class="card-header text-white text-center py-2 font-bold text-sm tracking-wider uppercase"
+            >
               Debug Pins
             </div>
             <div class="p-4 text-[12px] font-mono text-slate-700 space-y-2">
@@ -307,23 +353,28 @@
 
       // Pin map theo code Arduino
       const PINS = {
-        V0: "V0", // distanceCm
-        V1: "V1", // waterLevelCm
-        V2: "V2", // alertLevel (-1..3)
-        V3: "V3", // relay1 status (1 if RELAY_ON)
-        V4: "V4", // led SOS status
-        V20: "V20", // WARNING_LEVEL_1
-        V21: "V21", // WARNING_LEVEL_2
-        V22: "V22", // WARNING_LEVEL_3
+        V0: "v0",
+        V1: "v1",
+        V2: "v2",
+        V3: "v3",
+        V4: "v4",
+        V20: "v20",
+        V21: "v21",
+        V22: "v22",
       };
 
       function alertText(level) {
         switch (level) {
-          case 0: return "NORMAL";
-          case 1: return "WARNING 1";
-          case 2: return "WARNING 2";
-          case 3: return "DANGER";
-          default: return "SENSOR ERROR";
+          case 0:
+            return "NORMAL";
+          case 1:
+            return "WARNING 1";
+          case 2:
+            return "WARNING 2";
+          case 3:
+            return "DANGER";
+          default:
+            return "SENSOR ERROR";
         }
       }
 
@@ -338,12 +389,17 @@
       function setConnectionBadge(state, text) {
         const el = document.getElementById("connection-badge");
         if (!el) return;
-        el.className = "bg-red-600 text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1 shadow-lg";
+        el.className =
+          "bg-red-600 text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1 shadow-lg";
         if (state === "ok") {
-          el.className = "bg-emerald-600 text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1 shadow-lg";
-          el.innerHTML = '<span class="w-2 h-2 bg-white rounded-full"></span> LIVE';
+          el.className =
+            "bg-emerald-600 text-[10px] font-bold px-2 py-1 rounded flex items-center gap-1 shadow-lg";
+          el.innerHTML =
+            '<span class="w-2 h-2 bg-white rounded-full"></span> LIVE';
         } else {
-          el.innerHTML = '<span class="w-2 h-2 bg-white rounded-full"></span> ' + (text || "DISCONNECTED");
+          el.innerHTML =
+            '<span class="w-2 h-2 bg-white rounded-full"></span> ' +
+            (text || "DISCONNECTED");
         }
       }
 
@@ -371,7 +427,9 @@
 
       async function blynkGet(token, pin) {
         // Blynk Cloud: https://blynk.cloud/external/api/get?token=YOUR_TOKEN&V0
-        const url = `https://blynk.cloud/external/api/get?token=${encodeURIComponent(token)}&${encodeURIComponent(pin)}`;
+        const url = `https://blynk.cloud/external/api/get?token=${encodeURIComponent(
+          token
+        )}&${encodeURIComponent(pin)}`;
         const res = await fetch(url, { cache: "no-store" });
         if (!res.ok) throw new Error("Blynk GET failed for " + pin);
         const txt = await res.text();
@@ -381,9 +439,9 @@
 
       async function blynkUpdate(token, pin, value) {
         // Blynk Cloud: https://blynk.cloud/external/api/update?token=YOUR_TOKEN&V10=1
-        const url = `https://blynk.cloud/external/api/update?token=${encodeURIComponent(token)}&${encodeURIComponent(
-          pin
-        )}=${encodeURIComponent(value)}`;
+        const url = `https://blynk.cloud/external/api/update?token=${encodeURIComponent(
+          token
+        )}&${encodeURIComponent(pin)}=${encodeURIComponent(value)}`;
         const res = await fetch(url, { cache: "no-store" });
         if (!res.ok) throw new Error("Blynk UPDATE failed for " + pin);
         return true;
@@ -394,9 +452,14 @@
         const relay2El = document.getElementById("relay2-state");
         const ledEl = document.getElementById("led-state");
 
-        if (relay1El) relay1El.innerText = relay1On === null ? "--" : relay1On ? "ON" : "OFF";
-        if (relay2El) relay2El.innerText = relay2On === null ? "--" : relay2On ? "ON" : "OFF";
-        if (ledEl) ledEl.innerText = ledOn === null ? "--" : ledOn ? "ON" : "OFF";
+        if (relay1El)
+          relay1El.innerText =
+            relay1On === null ? "--" : relay1On ? "ON" : "OFF";
+        if (relay2El)
+          relay2El.innerText =
+            relay2On === null ? "--" : relay2On ? "ON" : "OFF";
+        if (ledEl)
+          ledEl.innerText = ledOn === null ? "--" : ledOn ? "ON" : "OFF";
       }
 
       function updateThresholdUI(level1, level2, level3) {
@@ -407,17 +470,40 @@
         if (el2) el2.value = isFiniteNumber(level2) ? level2 : "";
         if (el3) el3.value = isFiniteNumber(level3) ? level3 : "";
 
-        document.getElementById("pin-v20").innerText = isFiniteNumber(level1) ? level1 : "--";
-        document.getElementById("pin-v21").innerText = isFiniteNumber(level2) ? level2 : "--";
-        document.getElementById("pin-v22").innerText = isFiniteNumber(level3) ? level3 : "--";
+        document.getElementById("pin-v20").innerText = isFiniteNumber(level1)
+          ? level1
+          : "--";
+        document.getElementById("pin-v21").innerText = isFiniteNumber(level2)
+          ? level2
+          : "--";
+        document.getElementById("pin-v22").innerText = isFiniteNumber(level3)
+          ? level3
+          : "--";
       }
 
-      function updateAlertUI(distanceCm, waterLevelCm, alertLevel, relay1On, relay2On, ledOn) {
-        document.getElementById("pin-v0").innerText = isFiniteNumber(distanceCm) ? distanceCm : "--";
-        document.getElementById("pin-v1").innerText = isFiniteNumber(waterLevelCm) ? waterLevelCm : "--";
-        document.getElementById("pin-v2").innerText = isFiniteNumber(alertLevel) ? alertLevel : "--";
-        document.getElementById("pin-v3").innerText = relay1On === null ? "--" : relay1On ? 1 : 0;
-        document.getElementById("pin-v4").innerText = ledOn === null ? "--" : ledOn ? 1 : 0;
+      function updateAlertUI(
+        distanceCm,
+        waterLevelCm,
+        alertLevel,
+        relay1On,
+        relay2On,
+        ledOn
+      ) {
+        document.getElementById("pin-v0").innerText = isFiniteNumber(distanceCm)
+          ? distanceCm
+          : "--";
+        document.getElementById("pin-v1").innerText = isFiniteNumber(
+          waterLevelCm
+        )
+          ? waterLevelCm
+          : "--";
+        document.getElementById("pin-v2").innerText = isFiniteNumber(alertLevel)
+          ? alertLevel
+          : "--";
+        document.getElementById("pin-v3").innerText =
+          relay1On === null ? "--" : relay1On ? 1 : 0;
+        document.getElementById("pin-v4").innerText =
+          ledOn === null ? "--" : ledOn ? 1 : 0;
 
         const isSensorError = !isFiniteNumber(alertLevel) || alertLevel === -1;
         const distanceEl = document.getElementById("distance-cm");
@@ -427,8 +513,14 @@
         const alertBadge = document.getElementById("alert-badge");
         const alertTextEl = document.getElementById("alert-text");
 
-        if (distanceEl) distanceEl.innerText = isFiniteNumber(distanceCm) ? distanceCm.toFixed(1) : "--";
-        if (waterEl) waterEl.innerText = isFiniteNumber(waterLevelCm) ? waterLevelCm.toFixed(1) : "--";
+        if (distanceEl)
+          distanceEl.innerText = isFiniteNumber(distanceCm)
+            ? distanceCm.toFixed(1)
+            : "--";
+        if (waterEl)
+          waterEl.innerText = isFiniteNumber(waterLevelCm)
+            ? waterLevelCm.toFixed(1)
+            : "--";
 
         updateOutputsUI(relay1On, relay2On, ledOn);
 
@@ -463,17 +555,23 @@
         // Water meter (quick tag)
         if (waterMeterEl) {
           const meter =
-            alertLevel === 0 ? "SAFE" : alertLevel === 1 ? "WARNING" : alertLevel === 2 ? "CAUTION" : "DANGER";
+            alertLevel === 0
+              ? "SAFE"
+              : alertLevel === 1
+              ? "WARNING"
+              : alertLevel === 2
+              ? "CAUTION"
+              : "DANGER";
           waterMeterEl.innerText = meter;
           waterMeterEl.className =
             "status-badge text-[9px] font-bold py-1 px-3 rounded-full inline-block uppercase " +
             (alertLevel === 0
               ? "bg-green-600 text-white"
               : alertLevel === 1
-                ? "bg-amber-500 text-white"
-                : alertLevel === 2
-                  ? "bg-yellow-500 text-white"
-                  : "bg-red-600 text-white");
+              ? "bg-amber-500 text-white"
+              : alertLevel === 2
+              ? "bg-yellow-500 text-white"
+              : "bg-red-600 text-white");
         }
 
         // Alert badge
@@ -485,7 +583,10 @@
         }
         if (alertTextEl) alertTextEl.innerText = alertText(alertLevel);
         const alertLevelEl = document.getElementById("alert-level");
-        if (alertLevelEl) alertLevelEl.innerText = isFiniteNumber(alertLevel) ? alertLevel : "--";
+        if (alertLevelEl)
+          alertLevelEl.innerText = isFiniteNumber(alertLevel)
+            ? alertLevel
+            : "--";
       }
 
       function pushHistory(label, waterCm, distanceCm) {
@@ -579,24 +680,12 @@
           }
         };
 
-        const [
-          v0,
-          v1,
-          v2,
-          v3,
-          v4,
-          v20,
-          v21,
-          v22,
-        ] = await Promise.all([
+        const [v0, v1, v2, v3, v4] = await Promise.all([
           safeGet("V0"),
           safeGet("V1"),
           safeGet("V2"),
           safeGet("V3"),
           safeGet("V4"),
-          safeGet("V20"),
-          safeGet("V21"),
-          safeGet("V22"),
         ]);
 
         // Arduino: Relay 2 status is NOT sent on a V-pin in your current sketch.
@@ -605,16 +694,17 @@
         const relay2On = isFiniteNumber(v2) ? v2 === 2 || v2 === 3 : null;
         const ledOn = isFiniteNumber(v4) ? v4 === 1 : null;
 
-        const t1 = isFiniteNumber(v20) ? v20 : DEFAULT_WARNING_LEVEL_1;
-        const t2 = isFiniteNumber(v21) ? v21 : DEFAULT_WARNING_LEVEL_2;
-        const t3 = isFiniteNumber(v22) ? v22 : DEFAULT_WARNING_LEVEL_3;
+        const t1 = DEFAULT_WARNING_LEVEL_1;
+        const t2 = DEFAULT_WARNING_LEVEL_2;
+        const t3 = DEFAULT_WARNING_LEVEL_3;
 
         updateThresholdUI(t1, t2, t3);
         updateAlertUI(v0, v1, v2, relay1On, relay2On, ledOn);
 
         const now = new Date();
         const lastUpdateEl = document.getElementById("last-update");
-        if (lastUpdateEl) lastUpdateEl.innerText = now.toLocaleTimeString("vi-VN");
+        if (lastUpdateEl)
+          lastUpdateEl.innerText = now.toLocaleTimeString("vi-VN");
 
         // Chỉ đánh dấu LIVE nếu đọc được dữ liệu cảm biến chính (V0..V2).
         if (isFiniteNumber(v0) && isFiniteNumber(v1) && isFiniteNumber(v2)) {
@@ -630,12 +720,6 @@
         }
 
         // Hiển thị cảnh báo nếu không đọc được các ngưỡng (thường do sketch không virtualWrite V20..V22).
-        if (lastErrorEl) {
-          if (!isFiniteNumber(v20) || !isFiniteNumber(v21) || !isFiniteNumber(v22)) {
-            lastErrorEl.innerText =
-              "Note: Không đọc được V20..V22 từ Blynk (thường vì sketch chỉ nhận ngưỡng từ web). Trang đang hiển thị giá trị demo 40/80/120.";
-          }
-        }
       }
 
       async function applyOutputsFromUI() {
@@ -694,9 +778,11 @@
               await applyOutputsFromUI();
               // Không cập nhật ngay vì phải chờ ESP32 gửi lại pin.
               // Người dùng sẽ thấy trạng thái thay đổi sau vài giây.
-              document.getElementById("last-error").innerText = "Đã gửi lệnh điều khiển. Đang chờ ESP32 phản hồi...";
+              document.getElementById("last-error").innerText =
+                "Đã gửi lệnh điều khiển. Đang chờ ESP32 phản hồi...";
             } catch (err) {
-              document.getElementById("last-error").innerText = "Loi gui lenh: " + (err?.message || err);
+              document.getElementById("last-error").innerText =
+                "Loi gui lenh: " + (err?.message || err);
             }
           });
         }
@@ -705,9 +791,11 @@
           applyThresholdsBtn.addEventListener("click", async () => {
             try {
               await applyThresholdsFromUI();
-              document.getElementById("last-error").innerText = "Đã gửi ngưỡng. Đang chờ ESP32 áp dụng...";
+              document.getElementById("last-error").innerText =
+                "Đã gửi ngưỡng. Đang chờ ESP32 áp dụng...";
             } catch (err) {
-              document.getElementById("last-error").innerText = "Loi gui nguong: " + (err?.message || err);
+              document.getElementById("last-error").innerText =
+                "Loi gui nguong: " + (err?.message || err);
             }
           });
         }
@@ -719,31 +807,83 @@
 
         if (relay1Toggle) {
           relay1Toggle.addEventListener("change", () => {
-            document.getElementById("relay1-toggle-label").innerText = relay1Toggle.checked ? "ON" : "OFF";
+            document.getElementById("relay1-toggle-label").innerText =
+              relay1Toggle.checked ? "ON" : "OFF";
           });
         }
         if (relay2Toggle) {
           relay2Toggle.addEventListener("change", () => {
-            document.getElementById("relay2-toggle-label").innerText = relay2Toggle.checked ? "ON" : "OFF";
+            document.getElementById("relay2-toggle-label").innerText =
+              relay2Toggle.checked ? "ON" : "OFF";
           });
         }
         if (ledToggle) {
           ledToggle.addEventListener("change", () => {
-            document.getElementById("led-toggle-label").innerText = ledToggle.checked ? "ON" : "OFF";
+            document.getElementById("led-toggle-label").innerText =
+              ledToggle.checked ? "ON" : "OFF";
           });
         }
       }
+      async function loadAITrendSafe() {
+        try {
+          const trendEl = document.getElementById("ai-trend");
+          const messageEl = document.getElementById("ai-message");
+          const slopeEl = document.getElementById("ai-slope");
 
+          if (!trendEl || !messageEl || !slopeEl) return;
+
+          const res = await fetch("http://127.0.0.1:5000/predict-trend", {
+            cache: "no-store",
+          });
+
+          if (!res.ok) throw new Error("AI backend error");
+
+          const data = await res.json();
+
+          let trendText = "ĐANG PHÂN TÍCH";
+          if (data.trend === "rising_fast") trendText = "⚠️ TĂNG NHANH";
+          else if (data.trend === "rising") trendText = "📈 ĐANG TĂNG";
+          else if (data.trend === "falling") trendText = "📉 ĐANG GIẢM";
+          else if (data.trend === "stable") trendText = "✅ ỔN ĐỊNH";
+          else if (data.trend === "not_enough_data")
+            trendText = "⏳ ĐANG PHÂN TÍCH";
+
+          trendEl.innerText = trendText;
+          messageEl.innerText = data.message || "--";
+          slopeEl.innerText =
+            typeof data.slope_cm_per_sec === "number"
+              ? data.slope_cm_per_sec.toFixed(3)
+              : "--";
+              if (data.prediction) {
+  document.getElementById("pred-5").innerText =
+    data.prediction["5_min"] ?? "--";
+
+  document.getElementById("pred-10").innerText =
+    data.prediction["10_min"] ?? "--";
+
+  document.getElementById("pred-15").innerText =
+    data.prediction["15_min"] ?? "--";
+}
+        } catch (err) {
+          console.error("AI trend error:", err);
+        }
+      }
       window.onload = () => {
+        wireUI();
+
         const refreshBtn = document.getElementById("refresh-now");
         if (refreshBtn) {
-          refreshBtn.addEventListener("click", () => refreshOnce());
+          refreshBtn.addEventListener("click", () => {
+            refreshOnce();
+            loadAITrendSafe();
+          });
         }
 
-        // Initial refresh
         refreshOnce();
-        // Poll every 2 seconds to match ESP32 sending interval (2000ms)
+        loadAITrendSafe();
+
         setInterval(() => refreshOnce(), 2000);
+        setInterval(() => loadAITrendSafe(), 2000);
       };
     </script>
   </body>
